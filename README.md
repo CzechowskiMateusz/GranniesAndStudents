@@ -23,6 +23,21 @@ Wątek główny służy za zarządzanie poszczególnymi procesami w obrębie pro
 
 Wątek komunikacyjny zajmuje się obsługa otrzymywanych komunikatów między procesami. Struktura wiadomości (zawiera: nadawcę, wartość zegara oraz tag) określa nam bardziej dokładny pogląd na oczekiwania procesów względem zasobów oraz umożliwiają wdrożenie algorytmu Zegarów Lamporta. 
 
+## Opis struktur i zmiennych 
+- JarQueue - kolejka procesów oczekujących na dostęp do zasobu: Słoiki, [<Queue> początkowo pusta]
+- JamQueue - kolejka procesów oczekujących na dostęp do zasobu: Konfitura, [<Queue> początkowo pusta]
+- JarAckNum - liczba otrzymanych potwierdzeń, w przypadku Słoików, [Int, początkowo 0]
+- JamAckNum - liczba otrzymanych potwierdzeń, w przypadku Konfitura, [Int, początkowo 0] 
+- B - liczba procesów Babć
+- S - liczba procesów Studentek
+- P - liczba zasobów słoików
+- K - liczba zasobów konfitur
+
+## Dostępne stany procesów
+- INACTIVE - początkowy stan procesu, nie ubiega się o dostęp do sekcji krytycznej
+- WAIT - proces chce skorzystać z zasobu, czeka na dostęp do sekcji krytycznej
+- INSECTION - proces znajduje sie w sekcji krytycznej
+
 ## Pseudokod
 ```
 Proces Babci
@@ -36,5 +51,7 @@ Proces Babci
 ```
 
 ## Wygląd komunikatów
-{nadawca, zegar, tag}
+{id_nadawca, zegar, tag}
+
+tagi -> REQ_jar, ACK_jar, NEW_jam, REQ_jam, ACK_jam, FRE_jar
 
