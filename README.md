@@ -73,7 +73,11 @@ Proces Babci
 ```
 
 ## Wygląd komunikatów
-{id_nadawca, zegar, tag}
-
-tagi -> REQ_jar, ACK_jar, NEW_jam, REQ_jam, ACK_jam, FRE_jar
+Wszystkie komunikaty zawierają znacznik czasowy (timestamp), modyfikowany zgodnie z zasadami zegara logicznego Lamporta, id nadawcy oraz tag określający rodzaj komunikatu:
+- REQ_JAR - żądanie o dostęp do sekcji krytycznej dla zasobu typu słoik,
+- ACK_JAR - potwierdzenie dostępu do sekcji krytycznej dla zasobu typu słoik,
+- REQ_JAM - żądanie o dostęp do sekcji krytycznej dla zasobu typu konfitura,
+- ACK_JAM - potwierdzenie dostępu do sekcji krytycznej dla zasobu typu konfitura,
+- NEW_JAM - informacja o wyprodukowaniu zasobu typu konfitura przez proces babci,
+- FRE_RES - zwolnienie zasobów. 
 
