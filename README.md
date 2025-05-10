@@ -24,8 +24,17 @@ Wątek główny służy za zarządzanie poszczególnymi procesami w obrębie pro
 Wątek komunikacyjny zajmuje się obsługa otrzymywanych komunikatów między procesami. Struktura wiadomości (zawiera: nadawcę, wartość zegara oraz tag) określa nam bardziej dokładny pogląd na oczekiwania procesów względem zasobów oraz umożliwiają wdrożenie algorytmu Zegarów Lamporta. 
 
 ## Pseudokod
+```
+Proces Babci
+[Bi]:
+  state := INACTIVE
+  while true:
+    random
+    if wants_to_make_jam:
+      state := 
+
+```
 
 ## Wygląd komunikatów
 {nadawca, zegar, tag}
 
-## Rozwiązanie dostępu do sekcji krytycznych
