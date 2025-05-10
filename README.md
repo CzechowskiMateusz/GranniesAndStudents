@@ -19,6 +19,7 @@ Procesy działają z różną prędkością, mogą wręcz przez jakiś czas nie 
 ## Opis problemu
 Kod programu rozdzielono na cztery pliki; główny (main), dwa pliki dotyczące wątków oraz plik zawierający funkcje pomocnicze. Strukturę logiczną podzielono na dwa rodzaje wątków; główny i komunikacyjny. Dane wejściowe to B procesów babć, S procesów studentek oraz dwa rodzaje zasobów nierozróżnialnych; puste słoiki P oraz słoiki z konfiturą K. Każdy z procesów zajmuje się (jest w sekcji krytycznej) danym zasobem pseudolosową ilość czasu - ta wartość jest nieznana dla reszty procesów.
 
+## Opis procesu
 Wątek główny służy za zarządzanie poszczególnymi procesami w obrębie procesów babć oraz studentek. Odwołuje się do zainicjalizowanej w pętli głównej, w której przydzielone wcześniej wątki, posiadają własną logikę w zależności od przydziału roli. Babcie, jeżeli są chętne, zgłaszają się w kolejce po pusty słoik, a następnie przygotowują konfiturę. Studentki, z kolei informują nas o tym, czy są głodne, jeżeli tak i istnieje gotowa konfitura, to mogą się nią poczęstować. Ostatecznie studentka po zjedzeniu konfitury, zwalnia zasoby dotyczące konfitur oraz słoików. 
 
 Wątek komunikacyjny zajmuje się obsługa otrzymywanych komunikatów między procesami. Struktura wiadomości (zawiera: nadawcę, wartość zegara oraz tag) określa nam bardziej dokładny pogląd na oczekiwania procesów względem zasobów oraz umożliwiają wdrożenie algorytmu Zegarów Lamporta. 
@@ -26,8 +27,8 @@ Wątek komunikacyjny zajmuje się obsługa otrzymywanych komunikatów między pr
 ## Opis struktur i zmiennych 
 - JarQueue - kolejka procesów oczekujących na dostęp do zasobu: Słoiki, [<Queue> początkowo pusta]
 - JamQueue - kolejka procesów oczekujących na dostęp do zasobu: Konfitura, [<Queue> początkowo pusta]
-- JarAckNum - liczba otrzymanych potwierdzeń, w przypadku Słoików, [Int, początkowo 0]
-- JamAckNum - liczba otrzymanych potwierdzeń, w przypadku Konfitura, [Int, początkowo 0] 
+- JarAckNum - liczba otrzymanych potwierdzeń, w przypadku zasobu typu Słoik, [Int, początkowo 0]
+- JamAckNum - liczba otrzymanych potwierdzeń, w przypadku zasobu typu Konfitura, [Int, początkowo 0] 
 - B - liczba procesów Babć
 - S - liczba procesów Studentek
 - P - liczba zasobów słoików
@@ -44,9 +45,30 @@ Proces Babci
 [Bi]:
   state := INACTIVE
   while true:
-    random
-    if wants_to_make_jam:
-      state := 
+    if wants_to_make_jam: 
+      state := WAIT
+      priority := clock+1
+      ack := 0
+      sentToAll({REQ_JAR, priority})
+
+      while (B-1)-ack < P:
+        if recived({ACK_JAR}):
+          ack := ack+1
+
+      state := INSECTION
+      make_jam()
+      sendToStudent({NEW_JAM})
+      state := INACTIVE
+
+[Bj]:
+  if recived({REQ_JAR, priority_i}):
+    if not request_jar:
+      sendTo(Bi, {ACK_JAR})
+    else
+      if priority_i < own_priority:
+        sendTo(Bi, {ACK_JAR})
+      else
+        buff := buff+Bi
 
 ```
 
