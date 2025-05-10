@@ -4,8 +4,8 @@ Sprawozdanie przygotowane spejclanie do rozwiazania projektu: Stowarzyszenie bab
 Przedmiot: Przetwarzanie Rozproszone
 
 ### Autorzy:
-- Wiktoria Białasik 
-- Mateusz Czechowski 
+- Wiktoria Białasik 151436
+- Mateusz Czechowski 155921
 
 ## Treść zadania
 Grupa emerytek bardzo chciałaby robić konfitury dla wnuczek, tylko że niestety wnuczek nie mają. Na szczęście grupa studentek Uniwersytetu Artystycznego chciałaby, by ktoś je dokarmiał - więc wspólnie emerytki i studentki założyły stowarzyszenie, gdzie babcie tworzą konfitury, a studentki je zjadają, po czym oddają słoiki emerytkom. 
