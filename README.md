@@ -17,12 +17,15 @@ Wymogi: Babcie ubiegają się o słoiki. Gdy mają słoik, tworzą konfiturę. S
 Procesy działają z różną prędkością, mogą wręcz przez jakiś czas nie chcieć robić albo jeść konfitur. Nie powinno to blokować pracy innych procesów.
 
 ## Opis problemu
-Kod programu rozdzielono na cztery pliki; główny (main), dwa pliki dotyczące wątków oraz plik zawierający funkcje pomocnicze. Strukturę logiczną podzielono na dwa rodzaje wątków; główny i komunikacyjny. Dane wejściowe to B procesów babć, S procesów studentek oraz dwa rodzaje zasobów nierozróżnialnych; puste słoiki P oraz słoiki z konfiturą K. Każdy z procesów zajmuje się (jest w sekcji krytycznej) danym zasobem pseudolosową ilość czasu - ta wartość jest nieznana dla reszty procesów.
+Kod programu został podzielony na cztery pliki: główny plik main, dwa pliki zawierające logikę poszczególnych wątków oraz jeden plik pomocniczy, zawierający funkcje wykorzystywane w całym projekcie. Logiczna struktura aplikacji opiera się na dwóch rodzajach wątków: głównym oraz komunikacyjnym. Dane wejściowe obejmują B procesów reprezentujących babcie, S procesów reprezentujących studentki oraz dwa typy zasobów, które są nierozróżnialne z punktu widzenia systemu: puste słoiki (P) oraz słoiki z konfiturą (K). Każdy z procesów wchodzi do sekcji krytycznej związanej z zasobem na pseudolosowy czas, który nie jest znany pozostałym procesom, co odwzorowuje asynchroniczność działania systemu rozproszonego.
 
 ## Opis procesu
+W pliku main uruchamiany jest wątek główny, który odpowiada za inicjalizację oraz zarządzanie wszystkimi procesami — zarówno babć, jak i studentek. 
 Wątek główny służy za zarządzanie poszczególnymi procesami w obrębie procesów babć oraz studentek. Odwołuje się do zainicjalizowanej w pętli głównej, w której przydzielone wcześniej wątki, posiadają własną logikę w zależności od przydziału roli. Babcie, jeżeli są chętne, zgłaszają się w kolejce po pusty słoik, a następnie przygotowują konfiturę. Studentki, z kolei informują nas o tym, czy są głodne, jeżeli tak i istnieje gotowa konfitura, to mogą się nią poczęstować. Ostatecznie studentka po zjedzeniu konfitury, zwalnia zasoby dotyczące konfitur oraz słoików. 
 
-Wątek komunikacyjny zajmuje się obsługa otrzymywanych komunikatów między procesami. Struktura wiadomości (zawiera: nadawcę, wartość zegara oraz tag) określa nam bardziej dokładny pogląd na oczekiwania procesów względem zasobów oraz umożliwiają wdrożenie algorytmu Zegarów Lamporta. 
+Wątek komunikacyjny odpowiada za obsługę wszystkich wiadomości przesyłanych pomiędzy procesami. Każda wiadomość zawiera identyfikator nadawcy, wartość zegara logicznego Lamporta oraz tag informujący o typie komunikatu — na przykład: żądanie, potwierdzenie lub zwrot zasobu. Dzięki tej strukturze każdy proces jest w stanie określić intencje nadawcy oraz zaktualizować swój stan zgodnie z zaimplementowanym algorytmem zegara Lamporta. Przykładowo, po otrzymaniu żądania procesu o niższym priorytecie (według zegara), proces może natychmiast przesłać potwierdzenie. W przeciwnym wypadku umieszcza nadawcę w buforze oczekujących odpowiedzi. 
+
+Plik z funkcjami pomocniczymi zawiera zbiór funkcji wspomagających działanie wątków oraz używanych do komunikacji.
 
 ## Opis struktur i zmiennych 
 - JarQueue - kolejka procesów oczekujących na dostęp do zasobu: Słoiki, [<Queue> początkowo pusta]
