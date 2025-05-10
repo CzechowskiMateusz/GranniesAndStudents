@@ -40,8 +40,8 @@ Wątek komunikacyjny zajmuje się obsługa otrzymywanych komunikatów między pr
 - INSECTION - proces znajduje sie w sekcji krytycznej
 
 ## Pseudokod
-```
 Proces Babci
+```
 [Bi]:
   state := INACTIVE
   while true:
@@ -70,6 +70,37 @@ Proces Babci
       else
         buff := buff+Bi
 
+```
+
+Proces Studenki
+```
+[Si]:
+  state := INACTIVE
+  while true:
+    if wants_to_eat_jam: 
+      state := WAIT
+      priority := clock+1
+      ack := 0
+      sentToAll({REQ_JAM, priority})
+
+      while (S-1)-ack < K:
+        if recived({ACK_JAM}):
+          ack := ack+1
+
+      state := INSECTION
+      eat_jam()
+      sendToStudent({FRE_RES})
+      state := INACTIVE
+
+[Sj]:
+  if recived({REQ_JAM, priority_i}):
+    if not request_jam:
+      sendTo(Si, {ACK_JAM})
+    else
+      if priority_i < own_priority:
+        sendTo(Si, {ACK_JAM})
+      else
+        buff := buff+Si
 ```
 
 ## Wygląd komunikatów
