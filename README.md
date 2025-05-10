@@ -1,5 +1,6 @@
 # GranniesAndStudents
-Sprawozdanie przygotowane spejclanie do rozwiazania projektu: Stowarzyszenie babci i wnusi
+Sprawozdanie przygotowane spejclanie do rozwiazania projektu: Stowarzyszenie babci i wnusi.
+Przedmiot: Przetwarzanie Rozproszone
 
 ### Autorzy:
 - Wiktoria Białasik 
