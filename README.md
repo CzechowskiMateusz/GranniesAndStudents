@@ -54,14 +54,20 @@ Proces Babci
       state := WAIT
       priority := clock+1
       ack := 0
+      adds to JarQueue
       sentToAll({REQ_JAR, priority})
 
-      while (B-1)-ack < P:
+      while (B-1)-ack < P and availableJars  > 0:
         if recived({ACK_JAR}):
           ack := ack+1
 
+      wait until JarQueue.peek == Bi
+      removes from JarQueue
+      availableJars := availableJars - 1
+
       state := INSECTION
       make_jam()
+      usingJams := usingJams + 1
       sendToStudent({NEW_JAM})
       state := INACTIVE
 
@@ -73,7 +79,7 @@ Proces Babci
       if priority_i < own_priority:
         sendTo(Bi, {ACK_JAR})
       else
-        buff := buff+Bi
+        JarQueue.enqueue(Bi, priority_i)
 
 ```
 
@@ -86,14 +92,20 @@ Proces Studenki
       state := WAIT
       priority := clock+1
       ack := 0
+      adds to JamQueue
       sentToAll({REQ_JAM, priority})
 
-      while (S-1)-ack < K:
+      while (S-1)-ack < K and usingJam < K:
         if recived({ACK_JAM}):
           ack := ack+1
 
+      wait until JamQueue.peek() == Si
+      removes from JamQueue
+      usingJams := usingJams - 1
+
       state := INSECTION
       eat_jam()
+      availableJars := availableJars + 1
       sendToStudent({FRE_RES})
       state := INACTIVE
 
@@ -105,7 +117,7 @@ Proces Studenki
       if priority_i < own_priority:
         sendTo(Si, {ACK_JAM})
       else
-        buff := buff+Si
+        JamQueue.enqueue(Si, priority_i)
 ```
 
 ## Wygląd komunikatów
