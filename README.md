@@ -36,6 +36,8 @@ Plik z funkcjami pomocniczymi zawiera zbiór funkcji wspomagających działanie 
 - S - liczba procesów Studentek
 - P - liczba zasobów słoików
 - K - liczba zasobów konfitur
+- availableJars - obecna liczba dostępnych słoików, [Int, początkowo P]
+- usingJams - obecna liczba używanych konfitur, [Int, początkowo 0]
 
 ## Dostępne stany procesów
 - INACTIVE - początkowy stan procesu, nie ubiega się o dostęp do sekcji krytycznej
