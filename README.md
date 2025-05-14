@@ -83,7 +83,7 @@ Proces Babci
 
 ```
 
-Proces Studenki
+Proces Studentki
 ```
 [Si]:
   state := INACTIVE
