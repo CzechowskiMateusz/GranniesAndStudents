@@ -68,7 +68,7 @@ Proces Babci
       state := INSECTION
       make_jam()
       usingJams := usingJams + 1
-      sendToStudent({NEW_JAM})
+      sendToAll({NEW_JAM})
       state := INACTIVE
 
 [Bj]:
@@ -81,11 +81,11 @@ Proces Babci
       else
         JarQueue.enqueue(Bi, priority_i)
 
-  if recived({NEW_JAM, priority_i}):
+  if recived({NEW_JAM}):
       availableJars := availableJars - 1
       usingJams := usingJams + 1
 
-  if recived({FRE_RES, priority_i}):
+  if recived({FRE_RES}):
       usingJams := usingJams - 1
       availableJars := availableJars + 1
 ```
@@ -113,7 +113,7 @@ Proces Studentki
       state := INSECTION
       eat_jam()
       availableJars := availableJars + 1
-      sendToStudent({FRE_RES})
+      sendToAll({FRE_RES})
       state := INACTIVE
 
 [Sj]:
@@ -125,6 +125,14 @@ Proces Studentki
         sendTo(Si, {ACK_JAM})
       else
         JamQueue.enqueue(Si, priority_i)
+
+  if recived({NEW_JAM}):
+      availableJars := availableJars - 1
+      usingJams := usingJams + 1
+
+  if recived({FRE_RES}):
+      usingJams := usingJams - 1
+      availableJars := availableJars + 1
 ```
 
 ## Wygląd komunikatów
