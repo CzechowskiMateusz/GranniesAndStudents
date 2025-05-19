@@ -81,6 +81,13 @@ Proces Babci
       else
         JarQueue.enqueue(Bi, priority_i)
 
+  if recived({NEW_JAM, priority_i}):
+      availableJars := availableJars - 1
+      usingJams := usingJams + 1
+
+  if recived({FRE_RES, priority_i}):
+      usingJams := usingJams - 1
+      availableJars := availableJars + 1
 ```
 
 Proces Studentki
