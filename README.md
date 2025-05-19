@@ -61,7 +61,7 @@ Proces Babci
         if recived({ACK_JAR}):
           ack := ack+1
 
-      wait until JarQueue.peek == Bi
+      wait until JarQueue.peak == Bi
       removes from JarQueue
       availableJars := availableJars - 1
 
@@ -99,7 +99,7 @@ Proces Studentki
         if recived({ACK_JAM}):
           ack := ack+1
 
-      wait until JamQueue.peek() == Si
+      wait until JamQueue.peak() == Si
       removes from JamQueue
       usingJams := usingJams - 1
 
