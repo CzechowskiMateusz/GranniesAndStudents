@@ -3,13 +3,23 @@
 #include "watek_komunikacyjny.h"
 
 int rank, size;
-state_t stan=InRun;
+
 pthread_t threadKom, threadMon;
 pthread_mutex_t stateMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t ackJarMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t ackJamMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t availableJarsMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t usingJamsMut = PTHREAD_MUTEX_INITIALIZER;
+
 
 void finalizuj()
 {
     pthread_mutex_destroy( &stateMut);
+    pthread_mutex_destroy( &ackJarMut);
+    pthread_mutex_destroy( &ackJamMut);
+    pthread_mutex_destroy( &availableJarsMut);
+    pthread_mutex_destroy( &usingJamsMut);
+
     /* Czekamy, aż wątek potomny się zakończy */
     println("czekam na wątek \"komunikacyjny\"\n" );
     pthread_join(threadKom,NULL);
@@ -41,18 +51,40 @@ void check_thread_support(int provided)
     }
 }
 
+int clockLamp = 0;
+int priority = 0;
+int availableJars = SLOIKI;
+int usingJams = 0;
+struct kolejka *JarQueue = NULL;
+struct kolejka *JamQueue = NULL;
+state_t stan;
 
 int main(int argc, char **argv)
 {
     MPI_Status status;
     int provided;
+
     MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
     check_thread_support(provided);
     srand(rank);
-    inicjuj_typ_pakietu(); // tworzy typ pakietu
+    inicjuj_typ_pakietu(); 
+    
     packet_t pkt;
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_size(MPI_COMM_WORLD, &size); 
+
+    if (size < BABCIE + STUDENTKI) {
+        fprintf(stderr, "Za mało procesów! Potrzebuję przynajmniej %d procesów.\n", BABCIE + STUDENTKI);
+        finalizuj();
+    }
+
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (rank < BABCIE) { 
+        stan=INACTIVE_BABCIA;
+    }else{
+        stan=INACTIVE_STUDENTKA;
+    }
+
     pthread_create( &threadKom, NULL, startKomWatek , 0);
 
     mainLoop();

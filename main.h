@@ -7,27 +7,45 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
-
 #include "util.h"
+
 /* boolean */
 #define TRUE 1
 #define FALSE 0
 #define SEC_IN_STATE 1
 #define STATE_CHANGE_PROB 10
 
-#define ROOT 0
+/* liczba babć i studentów */
+#define BABCIE 3
+#define STUDENTKI 4
+#define BABCIA 1
+#define STUDENTKA 2
+
+/* liczba słoików i konfitur */
+#define SLOIKI 5 
+#define KONFITURY 4
+
+/* zmienne pomocnicze */
+extern int clockLamp;
+extern int priority;
+extern int availableJars;
+extern int usingJams;
+extern struct kolejka *JarQueue;
+extern struct kolejka *JamQueue;
 
 extern int rank;
 extern int size;
-typedef enum {InRun, InMonitor, InSend, InFinish} state_t;
+typedef enum {INACTIVE_BABCIA, WAIT_BABCIA, INSECTION_BABCIA, INACTIVE_STUDENTKA, WAIT_STUDENTKA, INSECTION_STUDENTKA} state_t;
+
 extern state_t stan;
 extern pthread_t threadKom, threadMon;
-
 extern pthread_mutex_t stateMut;
+extern pthread_mutex_t ackJarMut;
+extern pthread_mutex_t ackJamMut;
+extern pthread_mutex_t availableJarsMut;
+extern pthread_mutex_t usingJamsMut;
 
-
-
-
+// ------------------------------------------
 /* macro debug - działa jak printf, kiedy zdefiniowano
    DEBUG, kiedy DEBUG niezdefiniowane działa jak instrukcja pusta 
    
