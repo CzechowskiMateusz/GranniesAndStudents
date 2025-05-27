@@ -32,6 +32,8 @@ extern int availableJars;
 extern int usingJams;
 extern struct kolejka *JarQueue;
 extern struct kolejka *JamQueue;
+extern int ackJarNum;
+extern int ackJamNum;
 
 extern int rank;
 extern int size;
@@ -40,10 +42,16 @@ typedef enum {INACTIVE_BABCIA, WAIT_BABCIA, INSECTION_BABCIA, INACTIVE_STUDENTKA
 extern state_t stan;
 extern pthread_t threadKom, threadMon;
 extern pthread_mutex_t stateMut;
+extern pthread_mutex_t clockMut;
 extern pthread_mutex_t ackJarMut;
 extern pthread_mutex_t ackJamMut;
 extern pthread_mutex_t availableJarsMut;
 extern pthread_mutex_t usingJamsMut;
+extern pthread_mutex_t jarQueueMut;
+extern pthread_mutex_t jamQueueMut;
+
+/* funkcje */
+#define MAX(a,b) (((a) > (b)) ? (a) : (b))
 
 // ------------------------------------------
 /* macro debug - działa jak printf, kiedy zdefiniowano

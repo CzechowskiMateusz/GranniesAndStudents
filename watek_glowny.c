@@ -4,13 +4,14 @@
 void mainLoop()
 {
     srandom(rank);
-    int tag;
     int wants_to_make_jam = 0;
     int wants_to_eat_jam = 0;
-    int ack_jar=0, ack_jam=0;
-    
+    int localAck = 0;
+    int jars=0, jams=0;
+
     while (TRUE) {
 
+        debug("Stan słoików i konfitur: dostępne słoiki = %d, używane konfitury = %d", availableJars, usingJams);
         switch (stan) {
             // BABCIE
             case INACTIVE_BABCIA:
@@ -25,42 +26,33 @@ void mainLoop()
 
             case WAIT_BABCIA:
                 debug("Czy mogę robić konfitury?");
-                priority = clockLamp+1;
-                
+                pthread_mutex_lock(&clockMut);
+                priority = ++clockLamp;
+                pthread_mutex_unlock(&clockMut);
+
                 pthread_mutex_lock(&ackJarMut);
-                ack_jar = 0;
+                ackJarNum = 0;
                 pthread_mutex_unlock(&ackJarMut);
 
-                addsToQueue(REQ_JAR, priority, JarQueue);
+                addsToQueue(REQ_JAR, priority, &JarQueue);
                 sendToAll(REQ_JAR, priority);
 
-                debug("Czekam na odpowiedzi");
-                while (1) {
+                localAck = 0;
+                do {
                     pthread_mutex_lock(&ackJarMut);
-                    int current_ack_jar = ack_jar;
+                    localAck = ackJarNum;
                     pthread_mutex_unlock(&ackJarMut);
 
                     pthread_mutex_lock(&availableJarsMut);
-                    int current_availableJars = availableJars;
+                    jars = availableJars;
                     pthread_mutex_unlock(&availableJarsMut);
-
-                    if (((BABCIE - 1) - current_ack_jar >= SLOIKI) && current_availableJars <= 0) {
-                        break;
-                    }
-
-                    if (recvPacket(REQ_JAR, &ack_jar, ACK_JAR)) {
-                        pthread_mutex_lock(&ackJarMut);
-                        ack_jar++;
-                        pthread_mutex_unlock(&ackJarMut);
-                    }
-                }
+                } while ((BABCIE - 1 - localAck >= SLOIKI) || (jars < 1));
 
                 while(!isAtQueueTop(JarQueue, rank)){}
 
-                dequeue(JarQueue);
+                dequeue(&JarQueue);
                 pthread_mutex_lock(&availableJarsMut);
                 availableJars--;
-                debug("Stan słoików i konfitur: dostępne słoiki = %d, używane konfitury = %d", availableJars, usingJams);
                 pthread_mutex_unlock(&availableJarsMut);
                 changeState(INSECTION_BABCIA);
                 break;
@@ -70,7 +62,7 @@ void mainLoop()
                 //make_jam();
 
                 pthread_mutex_lock(&usingJamsMut);
-                usingJams += 1;
+                usingJams++;
                 pthread_mutex_unlock(&usingJamsMut);
 
                 sendToAll(NEW_JAM, priority);
@@ -89,41 +81,33 @@ void mainLoop()
                 }
                 break;
 
-                case WAIT_STUDENTKA:
+            case WAIT_STUDENTKA:
                 debug("Czy mogę zjeść konfiture?");
-                priority = clockLamp+1;
+                pthread_mutex_lock(&clockMut);
+                priority = ++clockLamp;
+                pthread_mutex_unlock(&clockMut);
 
                 pthread_mutex_lock(&ackJamMut);
-                ack_jam = 0;
+                ackJamNum = 0;
                 pthread_mutex_unlock(&ackJamMut);
-
-                addsToQueue(REQ_JAM, priority, JamQueue);
+                
+                addsToQueue(REQ_JAM, priority, &JamQueue);
                 sendToAll(REQ_JAM, priority);
 
-                debug("Czekam na odpowiedzi");
-                while (1) {
+                localAck = 0;
+                do {
                     pthread_mutex_lock(&ackJamMut);
-                    int current_ack_jam = ack_jam;
+                    localAck = ackJamNum;
                     pthread_mutex_unlock(&ackJamMut);
 
                     pthread_mutex_lock(&usingJamsMut);
-                    int current_usingJams = usingJams;
+                    jams = usingJams;
                     pthread_mutex_unlock(&usingJamsMut);
-
-                    if (((STUDENTKI - 1) - current_ack_jam >= KONFITURY) && current_usingJams >= KONFITURY) {
-                        break;
-                    }
-
-                    if (recvPacket(REQ_JAM, &ack_jam, ACK_JAM)) {
-                        pthread_mutex_lock(&ackJamMut);
-                        ack_jam++;
-                        pthread_mutex_unlock(&ackJamMut);
-                    }
-                }
-
+                } while ((STUDENTKI - 1 - localAck >= KONFITURY) || (jams < KONFITURY-1));
+  
                 while(!isAtQueueTop(JamQueue, rank)){}
 
-                dequeue(JamQueue);
+                dequeue(&JamQueue);
 
                 pthread_mutex_lock(&usingJamsMut);
                 usingJams--;
@@ -138,7 +122,7 @@ void mainLoop()
                 //eat_jam();
                 
                 pthread_mutex_lock(&availableJarsMut);
-                availableJars += 1;
+                availableJars++;
                 pthread_mutex_unlock(&availableJarsMut);
 
                 sendToAll(FRE_RES, priority);

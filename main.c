@@ -6,19 +6,27 @@ int rank, size;
 
 pthread_t threadKom, threadMon;
 pthread_mutex_t stateMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t clockMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t ackJarMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t ackJamMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t availableJarsMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t usingJamsMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t jarQueueMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t jamQueueMut = PTHREAD_MUTEX_INITIALIZER;
+
 
 
 void finalizuj()
 {
     pthread_mutex_destroy( &stateMut);
+    pthread_mutex_destroy( &clockMut);
     pthread_mutex_destroy( &ackJarMut);
     pthread_mutex_destroy( &ackJamMut);
     pthread_mutex_destroy( &availableJarsMut);
     pthread_mutex_destroy( &usingJamsMut);
+    pthread_mutex_destroy( &jarQueueMut);
+    pthread_mutex_destroy( &jamQueueMut);
+
 
     /* Czekamy, aż wątek potomny się zakończy */
     println("czekam na wątek \"komunikacyjny\"\n" );
@@ -57,6 +65,8 @@ int availableJars = SLOIKI;
 int usingJams = 0;
 struct kolejka *JarQueue = NULL;
 struct kolejka *JamQueue = NULL;
+int ackJarNum = 0;
+int ackJamNum = 0;
 state_t stan;
 
 int main(int argc, char **argv)

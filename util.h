@@ -25,8 +25,8 @@ struct kolejka{
 
 extern MPI_Datatype MPI_PAKIET_T;
 void inicjuj_typ_pakietu();
-void addsToQueue(int tag, int priority, struct kolejka *queue);
-void dequeue(struct kolejka *queue);
+void addsToQueue(int tag, int priority, struct kolejka **queue);
+void dequeue(struct kolejka **queue);
 int isAtQueueTop(struct kolejka *queue, int rank);
 void make_jam();
 void eat_jam();
