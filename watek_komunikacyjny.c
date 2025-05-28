@@ -20,7 +20,9 @@ void *startKomWatek(void *ptr)
                     (pakiet.ts == priority && pakiet.src < rank)) {
                     sendAck(pakiet.src, ACK_JAR);
                 } else {
+                    pthread_mutex_lock(&jarQueueMut);
                     addsToQueue(REQ_JAR, pakiet.ts, &JarQueue);
+                    pthread_mutex_unlock(&jarQueueMut);
                 }
                 break;
 
@@ -30,7 +32,9 @@ void *startKomWatek(void *ptr)
                     (pakiet.ts == priority && pakiet.src < rank)) {
                     sendAck(pakiet.src, ACK_JAM);
                 } else {
+                    pthread_mutex_lock(&jamQueueMut);
                     addsToQueue(REQ_JAM, pakiet.ts, &JamQueue);
+                    pthread_mutex_unlock(&jamQueueMut);
                 }
                 break;
 
@@ -48,25 +52,26 @@ void *startKomWatek(void *ptr)
 
             case NEW_JAM:
                 if (pakiet.src != rank) {
-                    pthread_mutex_lock(&availableJarsMut);
-                    availableJars--;
-                    pthread_mutex_unlock(&availableJarsMut);
-
                     pthread_mutex_lock(&usingJamsMut);
-                    usingJams++;
+                    if (usingJams < KONFITURY) {
+                        usingJams++;
+                    }
                     pthread_mutex_unlock(&usingJamsMut);
                 }
-                
                 break;
 
             case FRE_RES:
                 if (pakiet.src != rank) {
                     pthread_mutex_lock(&usingJamsMut);
-                    usingJams--;
+                    if (usingJams > 0) {
+                        usingJams--;
+                    }
                     pthread_mutex_unlock(&usingJamsMut);
 
                     pthread_mutex_lock(&availableJarsMut);
-                    availableJars++;
+                    if (availableJars < SLOIKI) {
+                        availableJars++;
+                    }
                     pthread_mutex_unlock(&availableJarsMut);
                 }
                 break;

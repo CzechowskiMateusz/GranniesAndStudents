@@ -69,7 +69,7 @@ void sendToAll(int tag, int priority){
     }
 }
 
-void sendAck(int tag, int destination){
+void sendAck(int destination, int tag){
     packet_t pkt;
     pkt.ts = clockLamp;
     pkt.src = rank;
@@ -99,22 +99,39 @@ int recvPacket(int expectedTag, int *ack, int expectedAckTag) {
 
 
 void addsToQueue(int tag, int priority, struct kolejka **queue){
+    if (queue == NULL) return;
+
     packet_t *pkt = malloc(sizeof(packet_t));
+    if (pkt == NULL) return;
+
     pkt->ts = priority;
     pkt->src = rank;
 
     struct kolejka *newNode = malloc(sizeof(struct kolejka));
+    if (newNode == NULL) {
+        free(pkt);
+        return;
+    }
+
     newNode->pkt = pkt;
     newNode->next = NULL;
 
-    if (*queue == NULL || pkt->ts < (*queue)->pkt->ts || (pkt->ts == (*queue)->pkt->ts && pkt->src < (*queue)->pkt->src)) {
+    if (*queue == NULL) {
+        *queue = newNode;
+        return;
+    }
+
+    if (pkt->ts < (*queue)->pkt->ts || 
+        (pkt->ts == (*queue)->pkt->ts && pkt->src < (*queue)->pkt->src)) {
         newNode->next = *queue;
         *queue = newNode;
         return;
     }
 
     struct kolejka *current = *queue;
-    while (current->next != NULL &&  (current->next->pkt->ts < pkt->ts || (current->next->pkt->ts == pkt->ts && current->next->pkt->src < pkt->src))) {
+    while (current->next != NULL && 
+           (current->next->pkt->ts < pkt->ts || 
+            (current->next->pkt->ts == pkt->ts && current->next->pkt->src < pkt->src))) {
         current = current->next;
     }
     newNode->next = current->next;

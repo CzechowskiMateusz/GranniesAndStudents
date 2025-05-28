@@ -14,8 +14,6 @@ pthread_mutex_t usingJamsMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t jarQueueMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t jamQueueMut = PTHREAD_MUTEX_INITIALIZER;
 
-
-
 void finalizuj()
 {
     pthread_mutex_destroy( &stateMut);
@@ -26,7 +24,6 @@ void finalizuj()
     pthread_mutex_destroy( &usingJamsMut);
     pthread_mutex_destroy( &jarQueueMut);
     pthread_mutex_destroy( &jamQueueMut);
-
 
     /* Czekamy, aż wątek potomny się zakończy */
     println("czekam na wątek \"komunikacyjny\"\n" );

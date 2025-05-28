@@ -15,6 +15,14 @@
 #define SEC_IN_STATE 1
 #define STATE_CHANGE_PROB 10
 
+/* message tags */
+#define REQ_JAR 1
+#define ACK_JAR 2
+#define REQ_JAM 3
+#define ACK_JAM 4
+#define NEW_JAM 5
+#define FRE_RES 6
+
 /* liczba babć i studentów */
 #define BABCIE 3
 #define STUDENTKI 4
@@ -49,6 +57,7 @@ extern pthread_mutex_t availableJarsMut;
 extern pthread_mutex_t usingJamsMut;
 extern pthread_mutex_t jarQueueMut;
 extern pthread_mutex_t jamQueueMut;
+extern pthread_mutex_t stdoutMut;
 
 /* funkcje */
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
@@ -73,13 +82,27 @@ extern pthread_mutex_t jamQueueMut;
                                             
 */
 #ifdef DEBUG
-#define debug(FORMAT,...) printf("%c[%d;%dm [%d]: " FORMAT "%c[%d;%dm\n",  27, (1+(rank/7))%2, 31+(6+rank)%7, rank, ##__VA_ARGS__, 27,0,37);
+#define debug(FORMAT,...) do { \
+    char buf[1024]; \
+    int len = snprintf(buf, sizeof(buf), "\033[%d;%dm[%d]: " FORMAT "\033[0m\n", \
+                      (1+(rank/7))%2, 31+(6+rank)%7, rank, ##__VA_ARGS__); \
+    if (len > 0 && len < sizeof(buf)) { \
+        write(STDOUT_FILENO, buf, len); \
+    } \
+} while(0)
 #else
 #define debug(...) ;
 #endif
 
 // makro println - to samo co debug, ale wyświetla się zawsze
-#define println(FORMAT,...) printf("%c[%d;%dm [%d]: " FORMAT "%c[%d;%dm\n",  27, (1+(rank/7))%2, 31+(6+rank)%7, rank, ##__VA_ARGS__, 27,0,37);
+#define println(FORMAT,...) do { \
+    char buf[1024]; \
+    int len = snprintf(buf, sizeof(buf), "\033[%d;%dm[%d]: " FORMAT "\033[0m\n", \
+                      (1+(rank/7))%2, 31+(6+rank)%7, rank, ##__VA_ARGS__); \
+    if (len > 0 && len < sizeof(buf)) { \
+        write(STDOUT_FILENO, buf, len); \
+    } \
+} while(0)
 
 void changeState( state_t );
 
