@@ -57,6 +57,12 @@ void *startKomWatek(void *ptr)
                         usingJams++;
                     }
                     pthread_mutex_unlock(&usingJamsMut);
+
+                    pthread_mutex_lock(&availableJarsMut);
+                    if (availableJars > 0) {
+                        availableJars--;
+                    }
+                    pthread_mutex_unlock(&availableJarsMut);
                 }
                 break;
 

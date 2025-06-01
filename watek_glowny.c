@@ -10,8 +10,11 @@ void mainLoop()
     int jars=0, jams=0;
 
     while (TRUE) {
-
-        debug("Stan słoików i konfitur: dostępne słoiki = %d, używane konfitury = %d", availableJars, usingJams);
+        
+        int totalInUse = SLOIKI - availableJars;
+        debug("Słoiki zajęte: %d (babcia + studentki), używane konfitury = %d", totalInUse, usingJams);
+        //debug("Stan słoików i konfitur: dostępne słoiki = %d, używane konfitury = %d", availableJars, usingJams);
+        
         switch (stan) {
             // BABCIE
             case INACTIVE_BABCIA:
@@ -48,7 +51,7 @@ void mainLoop()
                     pthread_mutex_lock(&availableJarsMut);
                     jars = availableJars;
                     pthread_mutex_unlock(&availableJarsMut);
-                } while ((BABCIE - 1 - localAck >= SLOIKI) || (jars < 1));
+                } while ((BABCIE - 1 - localAck >= SLOIKI) || (jars < 0) || (jars > SLOIKI));
 
                 pthread_mutex_lock(&jarQueueMut);
                 while(!isAtQueueTop(JarQueue, rank)){
@@ -69,7 +72,7 @@ void mainLoop()
             
             case INSECTION_BABCIA:
                 debug("Robię konfitury");
-                //make_jam();
+                make_jam();
 
                 pthread_mutex_lock(&usingJamsMut);
                 if (usingJams < KONFITURY) {
@@ -117,7 +120,7 @@ void mainLoop()
                     pthread_mutex_lock(&usingJamsMut);
                     jams = usingJams;
                     pthread_mutex_unlock(&usingJamsMut);
-                } while ((STUDENTKI - 1 - localAck >= KONFITURY) || (jams < KONFITURY-1));
+                } while ((STUDENTKI - 1 - localAck >= KONFITURY) || (jams < 0) || (jams > KONFITURY));
   
                 pthread_mutex_lock(&jamQueueMut);
                 while(!isAtQueueTop(JamQueue, rank)){
@@ -133,7 +136,7 @@ void mainLoop()
             
             case INSECTION_STUDENTKA:
                 debug("Jem konfitury");
-                //eat_jam();
+                eat_jam();
                 
                 pthread_mutex_lock(&usingJamsMut);
                 if (usingJams > 0) {

@@ -13,6 +13,7 @@ pthread_mutex_t availableJarsMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t usingJamsMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t jarQueueMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t jamQueueMut = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t pktMut = PTHREAD_MUTEX_INITIALIZER;
 
 void finalizuj()
 {
@@ -24,6 +25,7 @@ void finalizuj()
     pthread_mutex_destroy( &usingJamsMut);
     pthread_mutex_destroy( &jarQueueMut);
     pthread_mutex_destroy( &jamQueueMut);
+    pthread_mutex_destroy( &pktMut);
 
     /* Czekamy, aż wątek potomny się zakończy */
     println("czekam na wątek \"komunikacyjny\"\n" );

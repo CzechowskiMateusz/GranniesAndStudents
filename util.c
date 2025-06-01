@@ -45,6 +45,7 @@ void changeState( state_t newState ){
 }
 
 void sendPacket(packet_t *pkt, int destination, int tag){
+    pthread_mutex_lock(&pktMut);
     int freepkt=0;
     if (pkt==0) { 
         pkt = malloc(sizeof(packet_t)); 
@@ -56,6 +57,8 @@ void sendPacket(packet_t *pkt, int destination, int tag){
     MPI_Send( pkt, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD);
     debug("Wysyłam %s do %d\n", tag2string( tag), destination);
     if (freepkt) free(pkt);
+
+    pthread_mutex_unlock(&pktMut);
 }
 
 void sendToAll(int tag, int priority){
@@ -154,9 +157,9 @@ int isAtQueueTop(struct kolejka *queue, int rank){
 }
 
 void make_jam(){
-    sleep(1);
+    sleep(1+rand() %5);
 }
 
 void eat_jam(){
-    sleep(1); 
+    sleep(1+rand() %5);
 }

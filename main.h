@@ -26,8 +26,6 @@
 /* liczba babć i studentów */
 #define BABCIE 3
 #define STUDENTKI 4
-#define BABCIA 1
-#define STUDENTKA 2
 
 /* liczba słoików i konfitur */
 #define SLOIKI 5 
@@ -58,6 +56,7 @@ extern pthread_mutex_t usingJamsMut;
 extern pthread_mutex_t jarQueueMut;
 extern pthread_mutex_t jamQueueMut;
 extern pthread_mutex_t stdoutMut;
+extern pthread_mutex_t pktMut;
 
 /* funkcje */
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
