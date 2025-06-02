@@ -37,32 +37,22 @@ void mainLoop()
                 ackJarNum = 0;
                 pthread_mutex_unlock(&ackJarMut);
 
-                pthread_mutex_lock(&jarQueueMut);
-                addsToQueue(REQ_JAR, priority, &JarQueue);
-                pthread_mutex_unlock(&jarQueueMut);
                 sendToAll(REQ_JAR, priority);
 
                 localAck = 0;
+                pthread_mutex_lock(&availableJarsMut);
                 do {
                     pthread_mutex_lock(&ackJarMut);
                     localAck = ackJarNum;
                     pthread_mutex_unlock(&ackJarMut);
 
-                    pthread_mutex_lock(&availableJarsMut);
                     jars = availableJars;
-                    pthread_mutex_unlock(&availableJarsMut);
-                } while ((BABCIE - 1 - localAck >= SLOIKI) || (jars < 0) || (jars > SLOIKI));
+                    if ((BABCIE - 1 - localAck <= jars)) {
+                        break;
+                    }
+                    pthread_cond_wait(&jarAvailableCond, &availableJarsMut);
+                } while (1);
 
-                pthread_mutex_lock(&jarQueueMut);
-                while(!isAtQueueTop(JarQueue, rank)){
-                    pthread_mutex_unlock(&jarQueueMut);
-                    usleep(1000);
-                    pthread_mutex_lock(&jarQueueMut);
-                }
-                dequeue(&JarQueue);
-                pthread_mutex_unlock(&jarQueueMut);
-
-                pthread_mutex_lock(&availableJarsMut);
                 if (availableJars > 0) {
                     availableJars--;
                 }
@@ -106,31 +96,26 @@ void mainLoop()
                 ackJamNum = 0;
                 pthread_mutex_unlock(&ackJamMut);
                 
-                pthread_mutex_lock(&jamQueueMut);
-                addsToQueue(REQ_JAM, priority, &JamQueue);
-                pthread_mutex_unlock(&jamQueueMut);
                 sendToAll(REQ_JAM, priority);
 
                 localAck = 0;
+                pthread_mutex_lock(&usingJamsMut);
                 do {
                     pthread_mutex_lock(&ackJamMut);
                     localAck = ackJamNum;
                     pthread_mutex_unlock(&ackJamMut);
 
-                    pthread_mutex_lock(&usingJamsMut);
                     jams = usingJams;
-                    pthread_mutex_unlock(&usingJamsMut);
-                } while ((STUDENTKI - 1 - localAck >= KONFITURY) || (jams < 0) || (jams > KONFITURY));
-  
-                pthread_mutex_lock(&jamQueueMut);
-                while(!isAtQueueTop(JamQueue, rank)){
-                    pthread_mutex_unlock(&jamQueueMut);
-                    usleep(1000);
-                    pthread_mutex_lock(&jamQueueMut);
-                }
-                dequeue(&JamQueue);
-                pthread_mutex_unlock(&jamQueueMut);
+                    if ((STUDENTKI - 1 - localAck <= jams)) {
+                        break;
+                    }
+                    pthread_cond_wait(&jamAvailableCond, &usingJamsMut);
+                } while (1);
 
+                if (usingJams > 0) {
+                    usingJams--;
+                }
+                pthread_mutex_unlock(&usingJamsMut);
                 changeState(INSECTION_STUDENTKA);
                 break;
             

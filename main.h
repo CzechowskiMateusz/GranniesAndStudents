@@ -36,8 +36,8 @@ extern int clockLamp;
 extern int priority;
 extern int availableJars;
 extern int usingJams;
-extern struct kolejka *JarQueue;
-extern struct kolejka *JamQueue;
+//extern struct kolejka *JarQueue;
+//extern struct kolejka *JamQueue;
 extern int ackJarNum;
 extern int ackJamNum;
 
@@ -53,10 +53,14 @@ extern pthread_mutex_t ackJarMut;
 extern pthread_mutex_t ackJamMut;
 extern pthread_mutex_t availableJarsMut;
 extern pthread_mutex_t usingJamsMut;
-extern pthread_mutex_t jarQueueMut;
-extern pthread_mutex_t jamQueueMut;
+//extern pthread_mutex_t jarQueueMut;
+//extern pthread_mutex_t jamQueueMut;
 extern pthread_mutex_t stdoutMut;
 extern pthread_mutex_t pktMut;
+
+/* condition variables for resource availability */
+extern pthread_cond_t jarAvailableCond;
+extern pthread_cond_t jamAvailableCond;
 
 /* funkcje */
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))

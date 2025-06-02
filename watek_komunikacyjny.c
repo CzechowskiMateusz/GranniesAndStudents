@@ -19,10 +19,6 @@ void *startKomWatek(void *ptr)
                     pakiet.ts < priority ||
                     (pakiet.ts == priority && pakiet.src < rank)) {
                     sendAck(pakiet.src, ACK_JAR);
-                } else {
-                    pthread_mutex_lock(&jarQueueMut);
-                    addsToQueue(REQ_JAR, pakiet.ts, &JarQueue);
-                    pthread_mutex_unlock(&jarQueueMut);
                 }
                 break;
 
@@ -31,10 +27,6 @@ void *startKomWatek(void *ptr)
                     pakiet.ts < priority ||
                     (pakiet.ts == priority && pakiet.src < rank)) {
                     sendAck(pakiet.src, ACK_JAM);
-                } else {
-                    pthread_mutex_lock(&jamQueueMut);
-                    addsToQueue(REQ_JAM, pakiet.ts, &JamQueue);
-                    pthread_mutex_unlock(&jamQueueMut);
                 }
                 break;
 
@@ -42,12 +34,20 @@ void *startKomWatek(void *ptr)
                 pthread_mutex_lock(&ackJarMut);
                 ackJarNum++;
                 pthread_mutex_unlock(&ackJarMut);
+                
+                pthread_mutex_lock(&availableJarsMut);
+                pthread_cond_broadcast(&jarAvailableCond);
+                pthread_mutex_unlock(&availableJarsMut);
                 break;
 
             case ACK_JAM:
                 pthread_mutex_lock(&ackJamMut);
                 ackJamNum++;
                 pthread_mutex_unlock(&ackJamMut);
+                
+                pthread_mutex_lock(&usingJamsMut);
+                pthread_cond_broadcast(&jamAvailableCond);
+                pthread_mutex_unlock(&usingJamsMut);
                 break;
 
             case NEW_JAM:
@@ -56,6 +56,7 @@ void *startKomWatek(void *ptr)
                     if (usingJams < KONFITURY) {
                         usingJams++;
                     }
+                    pthread_cond_broadcast(&jamAvailableCond);
                     pthread_mutex_unlock(&usingJamsMut);
 
                     pthread_mutex_lock(&availableJarsMut);
@@ -78,6 +79,7 @@ void *startKomWatek(void *ptr)
                     if (availableJars < SLOIKI) {
                         availableJars++;
                     }
+                    pthread_cond_broadcast(&jarAvailableCond);
                     pthread_mutex_unlock(&availableJarsMut);
                 }
                 break;
